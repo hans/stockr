@@ -1,6 +1,13 @@
-(ns stockr.core)
+(ns stockr.core
+  (:require [stockr.dataset :as d]
+            [clj-ml.classifiers :as c]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defn build-classifier
+  [symbol & classifier-args]
+
+  (let [ds (d/build-classification-dataset symbol)
+        classifier-args (if (empty? classifier-args)
+                          '(:decision-tree :c45)
+                          classifier-args)
+        classifier (apply c/make-classifier classifier-args)]
+    (c/classifier-train classifier ds)))

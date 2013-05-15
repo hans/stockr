@@ -111,8 +111,9 @@
   (m/set-db! (m/get-db quote-db-name))
   (mc/find-maps quote-db-collection {:Symbol symbol}))
 
-(defn build-dataset
-  "Build a dataset for the given stock symbol."
+(defn build-classification-dataset
+  "Build a dataset for the given stock symbol which will be used in a
+  classification algorithm."
   [symbol]
 
   (let [quotes (stock-quotes symbol)
@@ -123,9 +124,12 @@
 
         attributes attributes-classification
         data (map #(make-example % quotes attributes) quote-indices)
-        boom (print (first data))
-        relation-name (str "stock_quotes_" symbol)]
-    (d/make-dataset relation-name attributes data)))
+        relation-name (str "stock_quotes_" symbol)
+
+        i (.indexOf attributes {:NextBehavior [:drop :hold :rise]})
+        ds (d/make-dataset relation-name attributes data)]
+    (d/dataset-set-class ds i)
+    ds))
 
 (def cli-spec
   [["-s" "--symbol" "Stock for which to generate data"]
@@ -134,4 +138,4 @@
 
 (defn -main [& args]
   (let [[options args banner] (apply (partial c/cli args) cli-spec)]
-    (print (build-dataset (:symbol options)))))
+    (print (build-classification-dataset (:symbol options)))))
