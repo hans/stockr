@@ -1,4 +1,4 @@
-(ns stockr.arff-generator
+(ns stockr.dataset
   (:require [monger.core :as m]
             [monger.collection :as mc]
             [clj-ml.data :as d]
@@ -112,16 +112,12 @@
   (m/set-db! (m/get-db quote-db-name))
   (mc/find-maps quote-db-collection {:Symbol symbol}))
 
-(def cli-spec
-  [["-s" "--symbol" "Stock for which to generate data"]
-   ["--classify" "Build data for a classifier" :flag true]
-   ["--regression" "Build data for a regression algorithm" :flag true]])
+(defn build-dataset
+  "Build a dataset for the given stock symbol."
+  [symbol]
 
-(defn -main [& args]
-  (let [[options args banner] (apply (partial c/cli args) cli-spec)
+  (let [quotes (stock-quotes symbol)
 
-        symbol (:symbol options)
-        quotes (stock-quotes symbol)
         ;; Ignore the first and last quotes, which don't have previous /
         ;; next quotes (some generated features will break)
         quote-indices (range 1 (dec (count quotes)))
@@ -130,4 +126,13 @@
         data (map #(make-example % quotes attributes) quote-indices)
         boom (print (first data))
         relation-name (str "stock_quotes_" symbol)]
-    (print (d/make-dataset relation-name attributes data))))
+    (d/make-dataset relation-name attributes data)))
+
+(def cli-spec
+  [["-s" "--symbol" "Stock for which to generate data"]
+   ["--classify" "Build data for a classifier" :flag true]
+   ["--regression" "Build data for a regression algorithm" :flag true]])
+
+(defn -main [& args]
+  (let [[options args banner] (apply (partial c/cli args) cli-spec)]
+    (print (build-dataset (:symbol options)))))
