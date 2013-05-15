@@ -2,8 +2,7 @@
   (:require [monger.core :as m]
             [monger.collection :as mc]
             [clj-ml.data :as d]
-            [clojure.tools.cli :as c])
-  (:use [monger.conversion :only [from-db-object]]))
+            [clojure.tools.cli :as c]))
 
 (def quote-db-host "localhost")
 (def quote-db-name "stocks")
