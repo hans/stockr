@@ -1,6 +1,7 @@
 (ns stockr.core
   (:require [stockr.dataset :as d]
-            [clj-ml.classifiers :as c]))
+            [clj-ml.classifiers :as c]
+            [clj-ml.data :as cd]))
 
 (defn build-classifier
   [symbol & classifier-args]
@@ -10,4 +11,6 @@
                           '(:decision-tree :c45)
                           classifier-args)
         classifier (apply c/make-classifier classifier-args)]
-    (c/classifier-train classifier ds)))
+    (c/classifier-train classifier ds)
+
+    [classifier ds]))
