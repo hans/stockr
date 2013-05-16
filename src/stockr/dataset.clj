@@ -37,11 +37,14 @@
   (concat attributes-fetch attributes-common
           '(:NextHigh :NextLow :NextVolume)))
 
+(def classification-label-attribute
+  {:NextBehavior [:drop :hold :rise]})
+
 (def attributes-classification
   "Attributes used exclusively in the classification model"
 
   (concat attributes-fetch attributes-common
-          '({:NextBehavior [:drop :hold :rise]})))
+          [classification-label-attribute]))
 
 (defmulti get-attribute
   "Fetch an attribute for a given instance."
@@ -126,7 +129,7 @@
         data (map #(make-example % quotes attributes) quote-indices)
         relation-name (str "stock_quotes_" symbol)
 
-        i (.indexOf attributes {:NextBehavior [:drop :hold :rise]})
+        i (.indexOf attributes classification-label-attribute)
         ds (d/make-dataset relation-name attributes data)]
     (d/dataset-set-class ds i)
     ds))
